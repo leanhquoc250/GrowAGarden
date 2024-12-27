@@ -3,189 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thiệp Chúc Mừng Ngày Nam Giới</title>
+    <title>Shop Bán Nick Game</title>
     <style>
-        /* Toàn bộ body của trang */
         body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
-            overflow: hidden;
-            background: #2C3E50; /* Nền tối màu */
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #333;
             color: white;
-            height: 100vh;
-        }
-
-        /* Nền parallax */
-        .parallax {
-            position: relative;
-            background: url('https://media.giphy.com/media/3o7aD2sZyt9zDkmhvy/giphy.gif') center center no-repeat;
-            background-size: cover;
-            height: 100vh;
-            filter: blur(3px);
-            z-index: -1;
-        }
-
-        /* Thiệp chính */
-        .card {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 60px 50px;
-            border-radius: 20px;
-            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.5);
+            padding: 20px;
             text-align: center;
-            z-index: 10;
-            animation: fadeInUp 1s ease-out;
         }
-
-        /* Hiệu ứng fadeInUp cho thiệp */
-        @keyframes fadeInUp {
-            0% {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        nav {
+            background-color: #444;
+            padding: 10px;
+            text-align: center;
         }
-
-        h1 {
-            font-size: 4rem;
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        section {
+            padding: 20px;
+            margin: 20px;
+        }
+        .game-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             margin-bottom: 20px;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
-            color: #1abc9c;
-            letter-spacing: 2px;
-            animation: bounceIn 1.5s ease-out;
+            padding: 15px;
+            text-align: center;
         }
-
-        /* Hiệu ứng bounce cho tiêu đề */
-        @keyframes bounceIn {
-            0% {
-                transform: translateY(-100px);
-                opacity: 0;
-            }
-            60% {
-                transform: translateY(25px);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(0);
-            }
-        }
-
-        p {
-            font-size: 1.5em;
-            margin-bottom: 30px;
-            line-height: 1.6;
-            animation: fadeInText 2s ease-in-out;
-        }
-
-        /* Hiệu ứng mờ dần cho đoạn văn */
-        @keyframes fadeInText {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-
-        /* Hình ảnh động (di chuột qua để xoay) */
-        img {
-            width: 200px;
-            height: auto;
-            border-radius: 50%;
-            border: 5px solid white;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
-            transition: transform 0.5s ease, box-shadow 0.3s ease;
-        }
-
-        img:hover {
-            transform: rotate(360deg) scale(1.1);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: 30px;
-            font-size: 1.2em;
-            color: #ddd;
-            animation: fadeInText 3s ease-in-out;
-        }
-
-        /* Hiệu ứng ánh sáng động */
-        .light-glow {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .game-card img {
             width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(46, 204, 113, 0.7), rgba(52, 152, 219, 0.7));
-            animation: glowEffect 1.5s infinite alternate;
-            z-index: -1;
+            max-width: 150px;
+            margin-bottom: 10px;
         }
-
-        @keyframes glowEffect {
-            0% {
-                opacity: 0.5;
-            }
-            100% {
-                opacity: 1;
-            }
+        .game-card h3 {
+            color: #333;
         }
-
-        /* Hiệu ứng 3D cho thiệp */
-        .card:hover {
-            transform: translate(-50%, -50%) rotateY(10deg);
-            box-shadow: 0px 10px 50px rgba(0, 0, 0, 0.7);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .game-card p {
+            color: #777;
         }
-
-        /* Nền parallax khi di chuột */
-        .parallax:hover {
-            animation: parallaxMove 30s infinite linear;
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
         }
-
-        @keyframes parallaxMove {
-            0% {
-                transform: scale(1) translateY(0);
-            }
-            100% {
-                transform: scale(1.1) translateY(10px);
-            }
-        }
-
     </style>
 </head>
 <body>
 
-    <!-- Nền parallax -->
-    <div class="parallax"></div>
+<header>
+    <h1>Shop Bán Nick Game</h1>
+    <p>Địa chỉ uy tín cho những game thủ muốn sở hữu nick game chất lượng!</p>
+</header>
 
-    <!-- Thiệp chúc mừng -->
-    <div class="card">
-        <h1>Chúc Mừng Ngày Nam Giới!</h1>
-        
-        <!-- Lời chúc dành cho ông -->
-        <p><strong>Kính gửi ông yêu quý của con,</strong></p>
-        <p>Ngày hôm nay, con muốn dành tất cả sự kính trọng và yêu thương để chúc ông một ngày thật đặc biệt. Ông là người đàn ông vĩ đại trong lòng con, là tấm gương sáng về sự kiên cường, hiền hậu và tình yêu thương bao la. Con luôn biết ơn vì có ông bên cạnh, người luôn dạy con những bài học quý giá về cuộc sống, về sự mạnh mẽ, kiên nhẫn và lòng nhân ái.</p>
-        <p>Chúc ông luôn dồi dào sức khỏe, sống lâu trăm tuổi, luôn vui vẻ và an yên bên gia đình. Những nụ cười và sự ấm áp của ông là món quà vô giá mà con sẽ luôn trân trọng.</p>
-        <p>Con yêu ông rất nhiều, và mong ông luôn hạnh phúc!</p>
+<nav>
+    <a href="#home">Trang Chủ</a>
+    <a href="#products">Sản Phẩm</a>
+    <a href="#contact">Liên Hệ</a>
+</nav>
 
-        <!-- Hình ảnh đại diện -->
-        <img src="https://via.placeholder.com/200" alt="Hình ảnh Nam Giới">
+<section id="home">
+    <h2>Chào Mừng Bạn Đến Với Shop Bán Nick Game</h2>
+    <p>Chúng tôi cung cấp những tài khoản game chất lượng, đảm bảo an toàn và uy tín. Mua ngay để tham gia vào những trận đấu thú vị cùng cộng đồng game thủ.</p>
+</section>
 
-        <div class="footer">
-            <p>Chúc ông có một ngày thật tuyệt vời và đầy niềm vui!</p>
-        </div>
+<section id="products">
+    <h2>Sản Phẩm</h2>
+    <div class="game-card">
+        <img src="https://via.placeholder.com/150" alt="Game 1">
+        <h3>Nick Game Liên Minh Huyền Thoại</h3>
+        <p>Cấp độ: 30</p>
+        <p>Giá: 150,000 VND</p>
+        <button>Mua Ngay</button>
     </div>
+    <div class="game-card">
+        <img src="https://via.placeholder.com/150" alt="Game 2">
+        <h3>Nick Game PUBG Mobile</h3>
+        <p>Cấp độ: 50</p>
+        <p>Giá: 200,000 VND</p>
+        <button>Mua Ngay</button>
+    </div>
+    <div class="game-card">
+        <img src="https://via.placeholder.com/150" alt="Game 3">
+        <h3>Nick Game Free Fire</h3>
+        <p>Cấp độ: 60</p>
+        <p>Giá: 100,000 VND</p>
+        <button>Mua Ngay</button>
+    </div>
+</section>
 
-    <!-- Hiệu ứng ánh sáng động -->
-    <div class="light-glow"></div>
+<section id="contact">
+    <h2>Liên Hệ</h2>
+    <p>Để mua nick game hoặc biết thêm thông tin, vui lòng liên hệ với chúng tôi qua thông tin dưới đây:</p>
+    <ul>
+        <li>Email: shopnickgame@example.com</li>
+        <li>Hotline: 0123456789</li>
+        <li>Facebook: <a href="https://facebook.com" target="_blank">Shop Nick Game</a></li>
+    </ul>
+</section>
+
+<footer>
+    <p>&copy; 2024 Shop Bán Nick Game. Tất cả quyền lợi được bảo vệ.</p>
+</footer>
 
 </body>
 </html>
