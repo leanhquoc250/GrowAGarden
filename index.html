@@ -1,126 +1,358 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shop Bán Nick Roblox - Fisch</title>
+    <title>Time Guardian</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #1e293b, #0f172a);
         }
-        header {
-            background-color: #3e8e41;
-            color: white;
-            padding: 20px;
-            text-align: center;
+
+        #gameCanvas {
+            display: none;
         }
-        nav {
-            background-color: #444;
-            padding: 10px;
-            text-align: center;
-        }
-        nav a {
-            color: white;
-            margin: 0 15px;
-            text-decoration: none;
+
+        .hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
             font-size: 18px;
+            display: none;
         }
-        nav a:hover {
-            text-decoration: underline;
+
+        .hud .health {
+            color: #f87171;
         }
-        section {
-            padding: 20px;
-            margin: 20px;
+
+        .hud .score {
+            color: #38bdf8;
         }
-        .game-card {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            padding: 15px;
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff6b6b;
+            font-size: 36px;
             text-align: center;
+            display: none;
         }
-        .game-card img {
-            width: 100%;
-            max-width: 150px;
-            margin-bottom: 10px;
+
+        .game-over button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #38bdf8;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
         }
-        .game-card h3 {
-            color: #333;
+
+        .game-over button:hover {
+            background-color: #0284c7;
         }
-        .game-card p {
-            color: #777;
-        }
-        footer {
-            background-color: #333;
+
+        #homeScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
             color: white;
             text-align: center;
-            padding: 10px;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
+        }
+
+        #homeScreen button {
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #38bdf8;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #homeScreen button:hover {
+            background-color: #0284c7;
+        }
+
+        #instructions {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        #instructions button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #38bdf8;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #instructions button:hover {
+            background-color: #0284c7;
         }
     </style>
 </head>
 <body>
-
-<header>
-    <h1>Shop Bán Nick Roblox - Fisch</h1>
-    <p>Chuyên cung cấp tài khoản Roblox cho game Fisch, chơi ngay để trải nghiệm những điều thú vị!</p>
-</header>
-
-<nav>
-    <a href="#home">Trang Chủ</a>
-    <a href="#products">Sản Phẩm</a>
-    <a href="#contact">Liên Hệ</a>
-</nav>
-
-<section id="home">
-    <h2>Chào Mừng Bạn Đến Với Shop Bán Nick Roblox - Fisch</h2>
-    <p>Shop của chúng tôi cung cấp các tài khoản Roblox trong game Fisch với nhiều cấp độ và các tính năng đặc biệt. Mua ngay để tham gia vào thế giới thú vị của Fisch!</p>
-</section>
-
-<section id="products">
-    <h2>Sản Phẩm</h2>
-    <div class="game-card">
-        <img src="https://via.placeholder.com/150" alt="Roblox Fisch Account 1">
-        <h3>Nick Fisch Cấp 50</h3>
-        <p>Cấp độ: 50 | Cá thu thập: 200</p>
-        <p>Giá: 200,000 VND</p>
-        <button>Mua Ngay</button>
+    <div id="homeScreen">
+        <h1>Welcome to Time Guardian</h1>
+        <button onclick="startGame()">Start</button>
+        <button onclick="showInstructions()">Instructions</button>
     </div>
-    <div class="game-card">
-        <img src="https://via.placeholder.com/150" alt="Roblox Fisch Account 2">
-        <h3>Nick Fisch Cấp 100</h3>
-        <p>Cấp độ: 100 | Cá thu thập: 500</p>
-        <p>Giá: 350,000 VND</p>
-        <button>Mua Ngay</button>
+
+    <div id="instructions">
+        <h2>How to Play</h2>
+        <p>
+            Use the following controls to move your character:
+        </p>
+        <ul style="text-align: left;">
+            <li>W: Move Up</li>
+            <li>S: Move Down</li>
+            <li>A: Move Left</li>
+            <li>D: Move Right</li>
+            <li>Mouse Click: Shoot Bullets</li>
+        </ul>
+        <button onclick="hideInstructions()">Back</button>
     </div>
-    <div class="game-card">
-        <img src="https://via.placeholder.com/150" alt="Roblox Fisch Account 3">
-        <h3>Nick Fisch Cấp 150</h3>
-        <p>Cấp độ: 150 | Cá thu thập: 800</p>
-        <p>Giá: 500,000 VND</p>
-        <button>Mua Ngay</button>
+
+    <canvas id="gameCanvas"></canvas>
+    <div class="hud" id="hud">
+        <div class="health">Health: <span id="health">100</span></div>
+        <div class="score">Score: <span id="score">0</span></div>
     </div>
-</section>
+    <div class="game-over" id="gameOver">
+        <p>Game Over</p>
+        <button onclick="restartGame()">Restart</button>
+    </div>
 
-<section id="contact">
-    <h2>Liên Hệ</h2>
-    <p>Để mua nick Roblox Fisch hoặc biết thêm thông tin, vui lòng liên hệ với chúng tôi qua thông tin dưới đây:</p>
-    <ul>
-        <li>Email: shopnickfisch@example.com</li>
-        <li>Hotline: 0123456789</li>
-        <li>Facebook: <a href="https://facebook.com" target="_blank">Shop Nick Fisch</a></li>
-    </ul>
-</section>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-<footer>
-    <p>&copy; 2024 Shop Bán Nick Roblox - Fisch. Tất cả quyền lợi được bảo vệ.</p>
-</footer>
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
+        let player;
+        let enemies = [];
+        let bullets = [];
+        let score = 0;
+        let health = 100;
+        let gameOver = false;
+
+        function startGame() {
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('gameCanvas').style.display = 'block';
+            document.getElementById('hud').style.display = 'block';
+            restartGame();
+        }
+
+        function showInstructions() {
+            document.getElementById('instructions').style.display = 'block';
+        }
+
+        function hideInstructions() {
+            document.getElementById('instructions').style.display = 'none';
+        }
+
+        class Player {
+            constructor(x, y, radius, color) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.color = color;
+                this.speed = 5;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            move(direction) {
+                if (direction === 'up' && this.y - this.radius > 0) this.y -= this.speed;
+                if (direction === 'down' && this.y + this.radius < canvas.height) this.y += this.speed;
+                if (direction === 'left' && this.x - this.radius > 0) this.x -= this.speed;
+                if (direction === 'right' && this.x + this.radius < canvas.width) this.x += this.speed;
+            }
+        }
+
+        class Enemy {
+            constructor(x, y, radius, color, velocity) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.color = color;
+                this.velocity = velocity;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                this.draw();
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+            }
+        }
+
+        class Bullet {
+            constructor(x, y, radius, color, velocity) {
+                this.x = x;
+                this.y = y;
+                this.radius = radius;
+                this.color = color;
+                this.velocity = velocity;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                this.draw();
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+            }
+        }
+
+        function spawnEnemies() {
+            setInterval(() => {
+                const radius = Math.random() * 30 + 10;
+                let x, y;
+
+                if (Math.random() < 0.5) {
+                    x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
+                    y = Math.random() * canvas.height;
+                } else {
+                    x = Math.random() * canvas.width;
+                    y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
+                }
+
+                const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
+                const angle = Math.atan2(player.y - y, player.x - x);
+                const velocity = {
+                    x: Math.cos(angle),
+                    y: Math.sin(angle),
+                };
+
+                enemies.push(new Enemy(x, y, radius, color, velocity));
+            }, 1000);
+        }
+
+        function animate() {
+            if (gameOver) return;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            player.draw();
+
+            bullets.forEach((bullet, index) => {
+                bullet.update();
+                if (
+                    bullet.x + bullet.radius < 0 ||
+                    bullet.x - bullet.radius > canvas.width ||
+                    bullet.y + bullet.radius < 0 ||
+                    bullet.y - bullet.radius > canvas.height
+                ) {
+                    bullets.splice(index, 1);
+                }
+            });
+
+            enemies.forEach((enemy, index) => {
+                enemy.update();
+                const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+                if (dist - enemy.radius - player.radius < 1) {
+                    health -= 10;
+                    enemies.splice(index, 1);
+                    if (health <= 0) gameOverHandler();
+                }
+
+                bullets.forEach((bullet, bulletIndex) => {
+                    const dist = Math.hypot(bullet.x - enemy.x, bullet.y - enemy.y);
+                    if (dist - enemy.radius - bullet.radius < 1) {
+                        score += 10;
+                        enemies.splice(index, 1);
+                        bullets.splice(bulletIndex, 1);
+                    }
+                });
+            });
+
+            document.getElementById('health').innerText = health;
+            document.getElementById('score').innerText = score;
+
+            requestAnimationFrame(animate);
+        }
+
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            player = new Player(canvas.width / 2, canvas.height / 2, 20, 'white');
+            enemies = [];
+            bullets = [];
+            health = 100;
+            score = 0;
+            gameOver = false;
+            spawnEnemies();
+            animate();
+        }
+
+        function gameOverHandler() {
+            gameOver = true;
+            document.getElementById('gameOver').style.display = 'block';
+            document.getElementById('hud').style.display = 'none';
+        }
+
+        window.addEventListener('keydown', (event) => {
+            if (!player) return;
+
+            if (event.key === 'w') player.move('up');
+            if (event.key === 's') player.move('down');
+            if (event.key === 'a') player.move('left');
+            if (event.key === 'd') player.move('right');
+        });
+
+        window.addEventListener('click', (event) => {
+            if (!player) return;
+
+            const angle = Math.atan2(event.clientY - player.y, event.clientX - player.x);
+            const velocity = {
+                x: Math.cos(angle) * 5,
+                y: Math.sin(angle) * 5,
+            };
+
+            bullets.push(new Bullet(player.x, player.y, 5, 'white', velocity));
+        });
+    </script>
 </body>
 </html>
