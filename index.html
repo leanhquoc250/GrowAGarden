@@ -1,358 +1,582 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Guardian</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #1e293b, #0f172a);
-        }
-
-        #gameCanvas {
-            display: none;
-        }
-
-        .hud {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #fff;
-            font-size: 18px;
-            display: none;
-        }
-
-        .hud .health {
-            color: #f87171;
-        }
-
-        .hud .score {
-            color: #38bdf8;
-        }
-
-        .game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ff6b6b;
-            font-size: 36px;
-            text-align: center;
-            display: none;
-        }
-
-        .game-over button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: #38bdf8;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .game-over button:hover {
-            background-color: #0284c7;
-        }
-
-        #homeScreen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: white;
-            text-align: center;
-        }
-
-        #homeScreen button {
-            margin: 10px;
-            padding: 15px 30px;
-            font-size: 20px;
-            background-color: #38bdf8;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        #homeScreen button:hover {
-            background-color: #0284c7;
-        }
-
-        #instructions {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 80%;
-            max-width: 500px;
-        }
-
-        #instructions button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: #38bdf8;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        #instructions button:hover {
-            background-color: #0284c7;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grow A Garden — Phiên bản đầy đủ</title>
+  <style>
+    :root{
+      --bg:#f5fff6; --panel:#ffffff; --accent:#3fb373; --muted:#5e6b5e;
+      --glass: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    body{font-family:Inter, "Segoe UI", Roboto, Arial; margin:0; background:linear-gradient(180deg,#eaffef,#f8fff9); color:#07321b}
+    header{padding:18px; display:flex; align-items:center; gap:12px}
+    h1{font-size:20px; margin:0}
+    .container{display:flex; gap:18px; padding:18px; align-items:flex-start; max-width:1200px; margin:0 auto}
+    .left{width:680px}
+    .right{flex:1; min-width:300px}
+    .panel{background:var(--panel); border-radius:14px; padding:14px; box-shadow:0 8px 24px rgba(9,36,19,0.06)}
+    .grid{display:grid; grid-template-columns:repeat(8,1fr); gap:10px; padding:12px; background:linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.6)); border-radius:10px}
+    .tile{background:linear-gradient(180deg,#f0fbf3,#e6f9ea); height:84px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; border:1px solid rgba(6,30,15,0.06)}
+    .tile.locked{opacity:0.45; filter:grayscale(0.2); cursor:not-allowed}
+    .tile .stage{font-size:28px}
+    .bar{height:8px; background:#e9f6ed; border-radius:6px; overflow:hidden; width:86%; margin:6px auto 0; box-shadow:inset 0 -2px 0 rgba(0,0,0,0.03)}
+    .bar > i{display:block; height:100%; background:linear-gradient(90deg,var(--accent),#6bd38b); width:0%}
+    .controls{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+    button{background:var(--accent); color:white; padding:8px 12px; border:none; border-radius:10px; cursor:pointer; font-weight:600}
+    button.secondary{background:#fff; color:var(--accent); border:1px solid rgba(63,179,115,0.14)}
+    .resource{display:flex; gap:12px; align-items:center; margin-bottom:6px}
+    .shop-item{display:flex; justify-content:space-between; gap:8px; padding:10px; border-radius:10px; align-items:center; border:1px solid rgba(6,30,15,0.03); margin-bottom:8px}
+    .muted{color:var(--muted); font-size:13px}
+    .badge{background:#fff; border-radius:8px; padding:6px 8px; border:1px solid rgba(6,30,15,0.06); font-weight:700}
+    .inventory-list{display:flex; gap:8px; flex-direction:column}
+    .flex{display:flex; gap:8px; align-items:center}
+    footer{padding:12px; text-align:center; color:var(--muted)}
+    .topbar{display:flex; justify-content:space-between; gap:12px; align-items:center}
+    .seed-btn{background:linear-gradient(180deg,#fff,#f6fff8); border-radius:8px; padding:6px 8px; border:1px solid rgba(6,30,15,0.04); cursor:pointer}
+    .selected{outline:3px solid rgba(63,179,115,0.18)}
+    /* small screens */
+    @media(max-width:980px){.container{flex-direction:column}.left{width:100%}}
+    /* cute SVG icon sizing */
+    .icon{width:40px;height:40px;display:inline-block;vertical-align:middle}
+  </style>
 </head>
 <body>
-    <div id="homeScreen">
-        <h1>Welcome to Time Guardian</h1>
-        <button onclick="startGame()">Start</button>
-        <button onclick="showInstructions()">Instructions</button>
+  <header>
+    <h1>🌼 Grow A Garden — Full (Cute Edition)</h1>
+    <div style="margin-left:auto; color:var(--muted); font-size:13px">Lưu: localStorage • Mở file trực tiếp</div>
+  </header>
+
+  <div class="container">
+    <div class="left panel">
+      <div class="topbar">
+        <div>
+          <div class="resource"><strong>Tiền:</strong> <span id="money">0</span> ₫</div>
+          <div class="resource"><strong>Hạt (Thường):</strong> <span id="seeds_basic">0</span> &nbsp; <strong>Hạt (Quý):</strong> <span id="seeds_premium">0</span></div>
+        </div>
+        <div style="text-align:right">
+          <div class="muted">Thời gian: <span id="time">0</span>s</div>
+          <div class="muted">Tốc độ: <span id="speed">1x</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" id="gardenWrap">
+        <div class="grid" id="garden"></div>
+      </div>
+
+<div class="controls" style="margin-top:12px">
+  <button id="plantBtn">🌱 Trồng</button>
+  <button id="plantAllBtn" class="secondary">🌱 Trồng tất cả</button>
+  <button id="waterBtn" class="secondary">💧 Tưới</button>
+  <button id="harvestBtn" class="secondary">🧺 Thu hoạch</button>
+  <button id="harvestAllBtn" class="secondary">🧺 Thu hoạch tất cả</button>
+  <button id="storeHarvestBtn" class="secondary">📦 Lưu vào kho</button>
+  <button id="buyTileBtn" class="secondary">🛒 Mua ô mới (200₫)</button>
+  <button id="skipBtn" class="secondary">⏭️ +5s</button>
+</div>
+
+
+
+      <div style="margin-top:10px; font-size:13px; color:var(--muted)">
+        Hướng dẫn ngắn: Chọn ô → Chọn loại hạt ở bên phải → Nhấn Trồng. Thu hoạch sẽ đưa trái cây vào kho, dùng Shop → Sell để bán.
+      </div>
     </div>
 
-    <div id="instructions">
-        <h2>How to Play</h2>
-        <p>
-            Use the following controls to move your character:
-        </p>
-        <ul style="text-align: left;">
-            <li>W: Move Up</li>
-            <li>S: Move Down</li>
-            <li>A: Move Left</li>
-            <li>D: Move Right</li>
-            <li>Mouse Click: Shoot Bullets</li>
-        </ul>
-        <button onclick="hideInstructions()">Back</button>
+    <div class="right">
+      <div class="panel">
+        <h3 style="margin-top:0">Shop — Mua hạt & Gear</h3>
+
+        <div style="display:flex; gap:8px; margin-bottom:10px; align-items:center;">
+          <button id="select_basic" class="seed-btn selected">🌱 Hạt Thường<br/><span class="muted">Giá mua: 20₫</span></button>
+          <button id="select_premium" class="seed-btn">🌸 Hạt Quý<br/><span class="muted">Giá mua: 120₫</span></button>
+        </div>
+
+        <div class="shop-item">
+          <div><strong>Mua Hạt Thường</strong><div class="muted">+1 hạt thường (20₫)</div></div>
+          <div><button id="buy_basic">Mua 20₫</button></div>
+        </div>
+
+        <div class="shop-item">
+          <div><strong>Mua Hạt Quý</strong><div class="muted">+1 hạt quý (120₫)</div></div>
+          <div><button id="buy_premium">Mua 120₫</button></div>
+        </div>
+
+        <hr style="border:none;height:8px">
+
+        <h4>Gear (cải tiến)</h4>
+        <div class="shop-item">
+          <div><strong>Bình tưới xịn</strong><div class="muted">Tăng 20% hiệu quả tưới (tích lũy)</div></div>
+          <div><button id="buy_sprayer">Mua 250₫</button></div>
+        </div>
+
+        <div class="shop-item">
+          <div><strong>Cuốc xịn</strong><div class="muted">Tăng 20% giá bán trái cây</div></div>
+          <div><button id="buy_shovel">Mua 350₫</button></div>
+        </div>
+
+        <hr style="border:none;height:8px">
+
+        <h4>Kho trái cây</h4>
+        <div class="inventory-list" id="inventoryBox">
+          <div class="flex"><div style="flex:1">Quả Thường</div><div class="badge" id="fruit_basic">0</div></div>
+          <div class="flex"><div style="flex:1">Quả Quý</div><div class="badge" id="fruit_premium">0</div></div>
+        </div>
+
+        <div style="margin-top:10px" class="flex">
+          <button id="sellAllBtn">💰 Bán tất cả</button>
+          <div class="muted" style="margin-left:auto">Giá: Quả Thường 80₫, Quả Quý 320₫</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h3 style="margin-top:0">Chi tiết ô</h3>
+        <div id="tileInfo">Chọn một ô để xem thông tin</div>
+      </div>
     </div>
+  </div>
 
-    <canvas id="gameCanvas"></canvas>
-    <div class="hud" id="hud">
-        <div class="health">Health: <span id="health">100</span></div>
-        <div class="score">Score: <span id="score">0</span></div>
-    </div>
-    <div class="game-over" id="gameOver">
-        <p>Game Over</p>
-        <button onclick="restartGame()">Restart</button>
-    </div>
+  <footer class="panel">Làm vì Rảnh:) — Phiên bản đầy đủ. Mở file trực tiếp trong trình duyệt.</footer>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+<script>
+/* --- CONFIG --- */
+const CONFIG = {
+  rows:4, cols:8,
+  initialUnlocked:12,
+  growBaseTime_basic: 22,      // seconds for basic seed
+  growBaseTime_premium: 48,    // seconds for premium seed
+  sell_price_basic: 80,
+  sell_price_premium: 320,
+  seed_price_basic: 20,
+  seed_price_premium: 120,
+  sprayer_price: 250,
+  shovel_price: 350,
+  start_money: 500,
+  start_seeds_basic: 5,
+  start_seeds_premium: 0
+};
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+/* --- STATE --- */
+const state = {
+  money: CONFIG.start_money,
+  seeds_basic: CONFIG.start_seeds_basic,
+  seeds_premium: CONFIG.start_seeds_premium,
+  time: 0,
+  speed: 1.0,
+  sprayerLevel: 0, // each level +0.2 watering efficiency
+  shovelLevel: 0,  // each level +0.2 sell bonus
+  unlockedTiles: CONFIG.initialUnlocked,
+  tiles: [], // {locked, planted, seedType, progress}
+  inventory: { fruit_basic:0, fruit_premium:0 },
+  selectedSeedType: 'basic',
+  selectedTile: null
+};
 
-        let player;
-        let enemies = [];
-        let bullets = [];
-        let score = 0;
-        let health = 100;
-        let gameOver = false;
+/* --- INIT TILES --- */
+const total = CONFIG.rows * CONFIG.cols;
+for(let i=0;i<total;i++){
+  state.tiles.push({ locked: i >= state.unlockedTiles, planted:false, seedType:null, progress:0, plantedAt:0 });
+}
 
-        function startGame() {
-            document.getElementById('homeScreen').style.display = 'none';
-            document.getElementById('gameCanvas').style.display = 'block';
-            document.getElementById('hud').style.display = 'block';
-            restartGame();
-        }
+/* --- DOM --- */
+const garden = document.getElementById('garden');
+const moneyEl = document.getElementById('money');
+const seedsBasicEl = document.getElementById('seeds_basic');
+const seedsPremiumEl = document.getElementById('seeds_premium');
+const timeEl = document.getElementById('time');
+const speedEl = document.getElementById('speed');
+const tileInfo = document.getElementById('tileInfo');
+const fruitBasicEl = document.getElementById('fruit_basic');
+const fruitPremiumEl = document.getElementById('fruit_premium');
 
-        function showInstructions() {
-            document.getElementById('instructions').style.display = 'block';
-        }
+/* seed select buttons */
+const selBasicBtn = document.getElementById('select_basic');
+const selPremiumBtn = document.getElementById('select_premium');
 
-        function hideInstructions() {
-            document.getElementById('instructions').style.display = 'none';
-        }
+selBasicBtn.addEventListener('click', ()=>{
+  state.selectedSeedType = 'basic';
+  selBasicBtn.classList.add('selected');
+  selPremiumBtn.classList.remove('selected');
+});
+selPremiumBtn.addEventListener('click', ()=>{
+  state.selectedSeedType = 'premium';
+  selPremiumBtn.classList.add('selected');
+  selBasicBtn.classList.remove('selected');
+});
 
-        class Player {
-            constructor(x, y, radius, color) {
-                this.x = x;
-                this.y = y;
-                this.radius = radius;
-                this.color = color;
-                this.speed = 5;
-            }
+/* --- RENDER GRID --- */
+function renderGrid(){
+  garden.innerHTML = '';
+  state.tiles.forEach((t,i)=>{
+    const div = document.createElement('div');
+    div.className = 'tile' + (t.locked ? ' locked' : '');
+    div.dataset.index = i;
 
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-            }
+    if(t.locked){
+      div.innerHTML = '<div style="text-align:center;color:var(--muted)"><svg class="icon" viewBox="0 0 24 24"><path fill="#9fbf9f" d="M12 2C9.79 2 8 3.79 8 6v2H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2h-2V6c0-2.21-1.79-4-4-4zM10 8V6a2 2 0 114 0v2h-4z"/></svg><div style="font-size:12px">Khóa</div></div>';
+    } else if(!t.planted){
+      div.innerHTML = '<div style="text-align:center"><svg class="icon" viewBox="0 0 24 24"><path fill="#3fb373" d="M12 2C10 6 6 7 6 12a6 6 0 0012 0c0-5-4-6-6-10z"/></svg></div>';
+    } else {
+      const p = t.progress;
+      let emoji = '🌱', label='Trồng';
+      if(t.seedType === 'basic'){ label='Hạt Thường'; }
+      else { label='Hạt Quý'; }
+      if(p < 0.25) emoji='🌱';
+      else if(p < 0.6) emoji='🌿';
+      else if(p < 0.95) emoji='🌼';
+      else emoji='🌻';
+      div.innerHTML = `<div style="text-align:center"><div class="stage">${emoji}</div><div style="font-size:12px;color:var(--muted)">${label}</div><div class="bar"><i style="width:${Math.round(p*100)}%"></i></div></div>`;
+    }
 
-            move(direction) {
-                if (direction === 'up' && this.y - this.radius > 0) this.y -= this.speed;
-                if (direction === 'down' && this.y + this.radius < canvas.height) this.y += this.speed;
-                if (direction === 'left' && this.x - this.radius > 0) this.x -= this.speed;
-                if (direction === 'right' && this.x + this.radius < canvas.width) this.x += this.speed;
-            }
-        }
+    if(state.selectedTile === i) div.classList.add('selected');
+    div.addEventListener('click', ()=>onTileClick(i));
+    garden.appendChild(div);
+  });
+}
 
-        class Enemy {
-            constructor(x, y, radius, color, velocity) {
-                this.x = x;
-                this.y = y;
-                this.radius = radius;
-                this.color = color;
-                this.velocity = velocity;
-            }
+/* --- TILE CLICK --- */
+function onTileClick(i){
+  state.selectedTile = i;
+  showTileInfo(i);
+  renderGrid();
+}
 
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-            }
+/* --- SHOW TILE INFO --- */
+function showTileInfo(i){
+  const t = state.tiles[i];
+  if(!t) { tileInfo.innerHTML = 'Không tìm thấy ô.'; return; }
+  if(t.locked){
+    tileInfo.innerHTML = `<strong>Ô ${i+1} (Khóa)</strong><div class="muted">Mua mở ô trong Shop.</div>`;
+  } else if(!t.planted){
+    tileInfo.innerHTML = `<strong>Ô ${i+1}</strong><div>Trống — chọn hạt và nhấn Trồng.</div>`;
+  } else {
+    const remain = Math.max(0, Math.ceil((1 - t.progress) * getGrowTime(t.seedType)));
+    tileInfo.innerHTML = `<strong>Ô ${i+1}</strong><div>Loại: ${t.seedType === 'basic' ? 'Hạt Thường' : 'Hạt Quý'}</div><div>Tiến trình: ${Math.round(t.progress*100)}%</div><div>Thời gian còn: ${remain}s</div>`;
+  }
+}
 
-            update() {
-                this.draw();
-                this.x += this.velocity.x;
-                this.y += this.velocity.y;
-            }
-        }
+/* --- GROW TIME --- */
+function getGrowTime(seedType){
+  if(seedType === 'basic') return CONFIG.growBaseTime_basic / state.speed;
+  return CONFIG.growBaseTime_premium / state.speed;
+}
 
-        class Bullet {
-            constructor(x, y, radius, color, velocity) {
-                this.x = x;
-                this.y = y;
-                this.radius = radius;
-                this.color = color;
-                this.velocity = velocity;
-            }
+/* --- CONTROLS --- */
+document.getElementById('plantBtn').addEventListener('click', ()=>{
+  const i = state.selectedTile;
+  if(i === null){ alert('Chọn ô trước khi trồng.'); return; }
+  const t = state.tiles[i];
+  if(t.locked){ alert('Ô đang khóa.'); return; }
+  if(t.planted){ alert('Ô đã có cây.'); return; }
+  // check seed
+  if(state.selectedSeedType === 'basic'){
+    if(state.seeds_basic <= 0){ alert('Không có hạt thường. Mua trong shop.'); return; }
+    state.seeds_basic -= 1;
+    t.planted = true; t.seedType='basic'; t.progress=0; t.plantedAt = state.time;
+  } else {
+    if(state.seeds_premium <= 0){ alert('Không có hạt quý. Mua trong shop.'); return; }
+    state.seeds_premium -= 1;
+    t.planted = true; t.seedType='premium'; t.progress=0; t.plantedAt = state.time;
+  }
+  playSound('plant');
+  save(); renderAll();
+});
 
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-            }
+document.getElementById('waterBtn').addEventListener('click', ()=>{
+  const i = state.selectedTile;
+  if(i === null){ alert('Chọn ô để tưới.'); return; }
+  const t = state.tiles[i];
+  if(t.locked || !t.planted){ alert('Ô không có cây để tưới.'); return; }
+  const efficiency = 0.12 * (1 + state.sprayerLevel * 0.20); // base 12%
+  t.progress = Math.min(1, t.progress + efficiency);
+  playSound('water');
+  save(); renderAll();
+});
 
-            update() {
-                this.draw();
-                this.x += this.velocity.x;
-                this.y += this.velocity.y;
-            }
-        }
+document.getElementById('harvestBtn').addEventListener('click', ()=>{
+  const i = state.selectedTile;
+  if(i === null){ alert('Chọn ô để thu hoạch.'); return; }
+  const t = state.tiles[i];
+  if(t.locked || !t.planted){ alert('Ô không có cây để thu hoạch.'); return; }
+  if(t.progress < 0.95){ alert('Cây chưa chín đủ.'); return; }
+  // when harvesting, store fruit into inventory instead of adding money
+  if(t.seedType === 'basic') state.inventory.fruit_basic += 1;
+  else state.inventory.fruit_premium += 1;
+  t.planted = false; t.progress = 0; t.seedType = null;
+  playSound('harvest');
+  save(); renderAll();
+});
 
-        function spawnEnemies() {
-            setInterval(() => {
-                const radius = Math.random() * 30 + 10;
-                let x, y;
+document.getElementById('storeHarvestBtn').addEventListener('click', ()=>{
+  // shortcut: if tile is ripe, store into inventory
+  const i = state.selectedTile;
+  if(i === null){ alert('Chọn ô.'); return; }
+  const t = state.tiles[i];
+  if(t.locked || !t.planted){ alert('Ô không có cây.'); return; }
+  if(t.progress < 0.95){ alert('Cây chưa chín đủ.'); return; }
+  if(t.seedType === 'basic') state.inventory.fruit_basic += 1;
+  else state.inventory.fruit_premium += 1;
+  t.planted = false; t.progress = 0; t.seedType = null;
+  playSound('harvest');
+  save(); renderAll();
+});
 
-                if (Math.random() < 0.5) {
-                    x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius;
-                    y = Math.random() * canvas.height;
-                } else {
-                    x = Math.random() * canvas.width;
-                    y = Math.random() < 0.5 ? 0 - radius : canvas.height + radius;
-                }
+document.getElementById('skipBtn').addEventListener('click', ()=>{
+  state.time += 5;
+  simulateProgress(5);
+  save(); renderAll();
+});
 
-                const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
-                const angle = Math.atan2(player.y - y, player.x - x);
-                const velocity = {
-                    x: Math.cos(angle),
-                    y: Math.sin(angle),
-                };
+/* BUY ITEMS */
+document.getElementById('buy_basic').addEventListener('click', ()=>{
+  if(state.money < CONFIG.seed_price_basic){ alert('Không đủ tiền.'); return; }
+  state.money -= CONFIG.seed_price_basic; state.seeds_basic += 1;
+  playSound('buy');
+  save(); renderAll();
+});
+document.getElementById('buy_premium').addEventListener('click', ()=>{
+  if(state.money < CONFIG.seed_price_premium){ alert('Không đủ tiền.'); return; }
+  state.money -= CONFIG.seed_price_premium; state.seeds_premium += 1;
+  playSound('buy');
+  save(); renderAll();
+});
+document.getElementById('buy_sprayer').addEventListener('click', ()=>{
+  if(state.money < CONFIG.sprayer_price){ alert('Không đủ tiền.'); return; }
+  state.money -= CONFIG.sprayer_price; state.sprayerLevel += 1;
+  playSound('buy');
+  save(); renderAll();
+});
+document.getElementById('buy_shovel').addEventListener('click', ()=>{
+  if(state.money < CONFIG.shovel_price){ alert('Không đủ tiền.'); return; }
+  state.money -= CONFIG.shovel_price; state.shovelLevel += 1;
+  playSound('buy');
+  save(); renderAll();
+});
 
-                enemies.push(new Enemy(x, y, radius, color, velocity));
-            }, 1000);
-        }
+/* SELL ALL */
+document.getElementById('sellAllBtn').addEventListener('click', ()=>{
+  const basic = state.inventory.fruit_basic;
+  const premium = state.inventory.fruit_premium;
+  if(basic === 0 && premium === 0){ alert('Kho trống.'); return; }
+  let total = 0;
+  let bonus = 1 + state.shovelLevel * 0.20;
+  total += basic * CONFIG.sell_price_basic * bonus;
+  total += premium * CONFIG.sell_price_premium * bonus;
+  state.money += Math.round(total);
+  state.inventory.fruit_basic = 0;
+  state.inventory.fruit_premium = 0;
+  playSound('sell');
+  save(); renderAll();
+});
 
-        function animate() {
-            if (gameOver) return;
+/* --- SIMULATION --- */
+function simulateProgress(deltaSec){
+  // increase progress based on time passed
+  state.tiles.forEach(t=>{
+    if(!t.locked && t.planted){
+      const growTime = getGrowTime(t.seedType);
+      const dt = deltaSec / growTime;
+      t.progress = Math.min(1, t.progress + dt);
+    }
+  });
+}
 
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+/* game clock */
+setInterval(()=>{
+  state.time += 1;
+  simulateProgress(1);
+  save(); renderAll();
+}, 1000);
 
-            player.draw();
+/* --- RENDER --- */
+function renderAll(){
+  renderGrid();
+  moneyEl.innerText = state.money;
+  seedsBasicEl.innerText = state.seeds_basic;
+  seedsPremiumEl.innerText = state.seeds_premium;
+  timeEl.innerText = state.time;
+  speedEl.innerText = state.speed.toFixed(2) + 'x';
+  fruitBasicEl.innerText = state.inventory.fruit_basic;
+  fruitPremiumEl.innerText = state.inventory.fruit_premium;
+  if(state.selectedTile !== null) showTileInfo(state.selectedTile);
+}
 
-            bullets.forEach((bullet, index) => {
-                bullet.update();
-                if (
-                    bullet.x + bullet.radius < 0 ||
-                    bullet.x - bullet.radius > canvas.width ||
-                    bullet.y + bullet.radius < 0 ||
-                    bullet.y - bullet.radius > canvas.height
-                ) {
-                    bullets.splice(index, 1);
-                }
-            });
+/* --- SAVE / LOAD --- */
+const SAVE_KEY = 'grow_a_garden_full_v1';
+function save(){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  }catch(e){ console.warn('Save failed', e); }
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    // copy fields carefully
+    state.money = s.money ?? state.money;
+    state.seeds_basic = s.seeds_basic ?? state.seeds_basic;
+    state.seeds_premium = s.seeds_premium ?? state.seeds_premium;
+    state.time = s.time ?? state.time;
+    state.speed = s.speed ?? state.speed;
+    state.sprayerLevel = s.sprayerLevel ?? state.sprayerLevel;
+    state.shovelLevel = s.shovelLevel ?? state.shovelLevel;
+    state.unlockedTiles = s.unlockedTiles ?? state.unlockedTiles;
+    if(Array.isArray(s.tiles) && s.tiles.length === state.tiles.length){
+      state.tiles = s.tiles;
+    }
+    state.inventory = s.inventory ?? state.inventory;
+    state.selectedSeedType = s.selectedSeedType ?? state.selectedSeedType;
+    state.selectedTile = s.selectedTile ?? state.selectedTile;
+  }catch(e){ console.warn('Load failed', e); }
+}
 
-            enemies.forEach((enemy, index) => {
-                enemy.update();
-                const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
-                if (dist - enemy.radius - player.radius < 1) {
-                    health -= 10;
-                    enemies.splice(index, 1);
-                    if (health <= 0) gameOverHandler();
-                }
+/* --- sounds via WebAudio --- */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new AudioCtx();
+}
+function playTone(freq, duration=0.08, type='sine'){
+  try{
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    o.connect(g); g.connect(audioCtx.destination);
+    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.2, audioCtx.currentTime + 0.01);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+    o.stop(audioCtx.currentTime + duration + 0.02);
+  }catch(e){}
+}
+function playSound(name){
+  if(name === 'water'){ playTone(880,0.06,'triangle'); }
+  else if(name === 'harvest'){ playTone(660,0.09,'sine'); playTone(880,0.06,'sine'); }
+  else if(name === 'plant'){ playTone(520,0.06,'sine'); }
+  else if(name === 'buy'){ playTone(740,0.05,'square'); }
+  else if(name === 'sell'){ playTone(440,0.12,'sine'); playTone(660,0.06,'sine'); }
+}
 
-                bullets.forEach((bullet, bulletIndex) => {
-                    const dist = Math.hypot(bullet.x - enemy.x, bullet.y - enemy.y);
-                    if (dist - enemy.radius - bullet.radius < 1) {
-                        score += 10;
-                        enemies.splice(index, 1);
-                        bullets.splice(bulletIndex, 1);
-                    }
-                });
-            });
+/* --- UTIL: clear save (for dev) --- */
+window.clearSave = function(){ localStorage.removeItem(SAVE_KEY); location.reload(); };
 
-            document.getElementById('health').innerText = health;
-            document.getElementById('score').innerText = score;
+// Thu hoạch tất cả ô đã chín
+document.getElementById('harvestAllBtn').addEventListener('click', ()=>{
+  let harvested = 0;
+  state.tiles.forEach(t=>{
+    if(!t.locked && t.planted && t.progress >= 0.95){
+      if(t.seedType === 'basic') state.inventory.fruit_basic++;
+      else state.inventory.fruit_premium++;
+      t.planted = false;
+      t.progress = 0;
+      t.seedType = null;// Thu hoạch tất cả ô đã chín
+document.getElementById('harvestAllBtn').addEventListener('click', ()=>{
+  let harvested = 0;
+  state.tiles.forEach(t=>{
+    if(!t.locked && t.planted && t.progress >= 0.95){
+      if(t.seedType === 'basic') state.inventory.fruit_basic++;
+      else state.inventory.fruit_premium++;
+      t.planted = false;
+      t.progress = 0;
+      t.seedType = null;
+      harvested++;
+    }
+  });
+  if(harvested === 0){
+    alert('Không có cây nào đã chín.');
+    return;
+  }
+  playSound('harvest');
+  save(); renderAll();
+});
 
-            requestAnimationFrame(animate);
-        }
+// Mua ô mới giá 200₫
+document.getElementById('buyTileBtn').addEventListener('click', ()=>{
+  const price = 200;
+  if(state.money < price){
+    alert('Không đủ tiền để mua ô mới.');
+    return;
+  }
+  const lockedIndex = state.tiles.findIndex(t=>t.locked);
+  if(lockedIndex === -1){
+    alert('Tất cả ô đã được mở.');
+    return;
+  }
+  state.money -= price;
+  state.tiles[lockedIndex].locked = false;
+  state.unlockedTiles++;
+  playSound('buy');
+  save(); renderAll();
+});
 
-        function restartGame() {
-            document.getElementById('gameOver').style.display = 'none';
-            player = new Player(canvas.width / 2, canvas.height / 2, 20, 'white');
-            enemies = [];
-            bullets = [];
-            health = 100;
-            score = 0;
-            gameOver = false;
-            spawnEnemies();
-            animate();
-        }
+      harvested++;
+    }
+  });
+  if(harvested === 0){
+    alert('Không có cây nào đã chín.');
+    return;
+  }
+  playSound('harvest');
+  save(); renderAll();
+});
 
-        function gameOverHandler() {
-            gameOver = true;
-            document.getElementById('gameOver').style.display = 'block';
-            document.getElementById('hud').style.display = 'none';
-        }
+// Mua ô mới giá 200₫
+document.getElementById('buyTileBtn').addEventListener('click', ()=>{
+  const price = 200;
+  if(state.money < price){
+    alert('Không đủ tiền để mua ô mới.');
+    return;
+  }
+  const lockedIndex = state.tiles.findIndex(t=>t.locked);
+  if(lockedIndex === -1){
+    alert('Tất cả ô đã được mở.');
+    return;
+  }
+  state.money -= price;
+  state.tiles[lockedIndex].locked = false;
+  state.unlockedTiles++;
+  playSound('buy');
+  save(); renderAll();
+});
 
-        window.addEventListener('keydown', (event) => {
-            if (!player) return;
+// Trồng tất cả ô trống bằng loại hạt đang chọn
+document.getElementById('plantAllBtn').addEventListener('click', ()=>{
+  let planted = 0;
+  state.tiles.forEach(t=>{
+    if(!t.locked && !t.planted){
+      if(state.selectedSeedType === 'basic' && state.seeds_basic > 0){
+        state.seeds_basic--;
+        t.planted = true;
+        t.seedType = 'basic';
+        t.progress = 0;
+        t.plantedAt = state.time;
+        planted++;
+      }
+      else if(state.selectedSeedType === 'premium' && state.seeds_premium > 0){
+        state.seeds_premium--;
+        t.planted = true;
+        t.seedType = 'premium';
+        t.progress = 0;
+        t.plantedAt = state.time;
+        planted++;
+      }
+    }
+  });
+  if(planted === 0){
+    alert('Không còn ô trống hoặc không đủ hạt.');
+    return;
+  }
+  playSound('plant');
+  save(); renderAll();
+});
 
-            if (event.key === 'w') player.move('up');
-            if (event.key === 's') player.move('down');
-            if (event.key === 'a') player.move('left');
-            if (event.key === 'd') player.move('right');
-        });
 
-        window.addEventListener('click', (event) => {
-            if (!player) return;
 
-            const angle = Math.atan2(event.clientY - player.y, event.clientX - player.x);
-            const velocity = {
-                x: Math.cos(angle) * 5,
-                y: Math.sin(angle) * 5,
-            };
-
-            bullets.push(new Bullet(player.x, player.y, 5, 'white', velocity));
-        });
-    </script>
+/* --- initial load & first render --- */
+load();
+renderAll();
+</script>
 </body>
 </html>
