@@ -50,10 +50,30 @@
 </style>
 </head>
 <body>
+
+<!-- MÀN HÌNH ĐĂNG NHẬP -->
+<div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#f4f4f4;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;font-family:sans-serif">
+  <h2>🌼 Grow A Garden — Beta</h2>
+  <input id="username" placeholder="Tên đăng nhập" style="padding:8px;margin:6px;font-size:16px">
+  <input id="password" type="password" placeholder="Mật khẩu" style="padding:8px;margin:6px;font-size:16px">
+  <button id="loginBtn" style="padding:8px 16px;margin-top:8px">Đăng nhập</button>
+  <p id="loginMsg" style="color:red;margin-top:8px"></p>
+  <hr style="width:200px;margin:10px 0">
+<h3>Đăng ký tài khoản mới</h3>
+<input id="newUser" placeholder="Tên đăng nhập mới" style="padding:8px;margin:6px;font-size:16px">
+<input id="newPass" type="password" placeholder="Mật khẩu mới" style="padding:8px;margin:6px;font-size:16px">
+<label><input type="checkbox" id="newBeta"> Tham gia Beta</label><br>
+<button id="registerBtn" style="padding:8px 16px;margin-top:8px">Đăng ký</button>
+<p id="registerMsg" style="color:blue;margin-top:8px"></p>
+
+</div>
+<!-- HẾT PHẦN ĐĂNG NHẬP -->
+
 <header>
   <h1>🌼 Grow A Garden</h1>
   <div style="margin-left:auto" class="muted">Lưu: localStorage • Mở file trực tiếp</div>
 </header>
+
 
 <div class="wrap">
   <div class="left panel">
@@ -73,6 +93,7 @@
       <button id="plantBtn">🌱 Trồng</button>
       <button id="plantAllBtn" class="secondary">🌱 Trồng tất cả</button>
       <button id="waterBtn" class="secondary">💧 Tưới</button>
+	  <button id="waterAllBtn" class="secondary">💧 Tưới tất cả</button>
       <button id="harvestBtn" class="secondary">🧺 Thu hoạch</button>
       <button id="harvestAllBtn" class="secondary">🧺 Thu hoạch tất cả</button>
       <button id="storeHarvestBtn" class="secondary">📦 Lưu vào kho</button>
@@ -143,12 +164,14 @@ const SEEDS = {
 const ORDER = ['u','c','r','m','d','p'];
 
 const CONFIG = {
-  rows:4, cols:8, initialUnlocked:12,
+  rows:12, cols:8, initialUnlocked:12,
   sprayer_price:250, shovel_price:350,
   start_money:1000,
   startSeeds:{u:2,c:1,r:0,m:0,d:0,p:0},
   buyTilePrice:200
 };
+
+
 
 /* ======= STATE ======= */
 const state = {
@@ -273,6 +296,22 @@ document.getElementById('waterBtn').onclick=()=>{
   t.progress=Math.min(1, t.progress+eff);
   ding('water'); save(); renderAll();
 };
+document.getElementById('waterAllBtn').onclick=()=>{
+  let watered = 0;
+  state.tiles.forEach(t=>{
+    if(!t.locked && t.planted){
+      const eff = 0.12*(1+state.sprayerLevel*0.2);
+      t.progress = Math.min(1, t.progress+eff);
+      watered++;
+    }
+  });
+  if(!watered){
+    alert('Không có cây nào để tưới.');
+    return;
+  }
+  ding('water'); save(); renderAll();
+};
+
 document.getElementById('harvestBtn').onclick=()=>harvestOne(true);
 document.getElementById('storeHarvestBtn').onclick=()=>harvestOne(true);
 function harvestOne(toInv){
@@ -370,16 +409,80 @@ function ding(name){
   else if(name==='sell'){beep(440,.12);beep(660,.06);}
 }
 
-/* ======= SAVE/LOAD ======= */
-const SAVE_KEY='garden6_v1';
-function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }catch(e){} }
+/* ====== Khởi tạo tài khoản từ localStorage ====== */
+let ACCOUNTS = JSON.parse(localStorage.getItem("accounts") || "[]");
+
+// Nếu chưa có tài khoản mẫu, thêm vào
+if (ACCOUNTS.length === 0) {
+  ACCOUNTS = [
+    {user: "admin", pass: "1234", beta: true},
+    {user: "quoc", pass: "matkhau", beta: false}
+  ];
+  localStorage.setItem("accounts", JSON.stringify(ACCOUNTS));
+}
+
+let currentUser = null;
+let SAVE_KEY = null;
+
+/* ====== Đăng nhập ====== */
+document.getElementById('loginBtn').onclick = () => {
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value.trim();
+  const acc = ACCOUNTS.find(a => a.user === u && a.pass === p);
+
+  if (!acc) {
+    document.getElementById('loginMsg').textContent = "❌ Sai tên hoặc mật khẩu!";
+    return;
+  }
+  if (!acc.beta) {
+    document.getElementById('loginMsg').textContent = "🚫 Tài khoản này chưa tham gia chương trình beta!";
+    return;
+  }
+
+  currentUser = acc.user;
+  SAVE_KEY = "garden6_beta_" + currentUser;
+
+  load();
+  renderAll();
+  document.getElementById('loginScreen').style.display = "none";
+};
+
+/* ====== Đăng ký ====== */
+document.getElementById('registerBtn').onclick = () => {
+  const u = document.getElementById('newUser').value.trim();
+  const p = document.getElementById('newPass').value.trim();
+  const b = document.getElementById('newBeta').checked;
+
+  if (!u || !p) {
+    document.getElementById('registerMsg').textContent = "⚠️ Vui lòng nhập đủ tên và mật khẩu!";
+    return;
+  }
+  if (ACCOUNTS.find(a => a.user === u)) {
+    document.getElementById('registerMsg').textContent = "⚠️ Tên đăng nhập đã tồn tại!";
+    return;
+  }
+
+  ACCOUNTS.push({ user: u, pass: p, beta: b });
+  localStorage.setItem("accounts", JSON.stringify(ACCOUNTS)); // lưu vào localStorage
+  document.getElementById('registerMsg').textContent = "✅ Đăng ký thành công! Giờ bạn có thể đăng nhập.";
+};
+
+/* ====== SAVE / LOAD riêng cho từng tài khoản ====== */
+function save(){ 
+  if (!SAVE_KEY) return;
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }catch(e){} 
+}
 function load(){
+  if (!SAVE_KEY) return;
   try{
-    const raw=localStorage.getItem(SAVE_KEY); if(!raw) return;
+    const raw=localStorage.getItem(SAVE_KEY); 
+    if(!raw) return;
     const s=JSON.parse(raw);
     Object.assign(state,seedsSafe(state,s));
   }catch(e){}
 }
+
+
 function seedsSafe(def,s){
   const safe = JSON.parse(JSON.stringify(def));
   ['money','sprayerLevel','shovelLevel','time','speed','selected','selectedTile'].forEach(k=>{
